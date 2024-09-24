@@ -2,6 +2,10 @@ import { useRouter } from 'vue-router'
 import { defineStore } from 'pinia'
 import api from './api'
 import { useErrorStore } from './errorStore'
+import { useFileStore } from './fileStore'
+import { useLibraryStore } from './libraryStore'
+import { useCameraStore } from './cameraStore'
+import { useHomeStore } from './homeStore'
 
 export const useAccountStore = defineStore('accountStore', {
     state: ()=> {
@@ -48,6 +52,9 @@ export const useAccountStore = defineStore('accountStore', {
                 if(response.status == 201 || response.status == 200){
                     this.user = null
                     this.router.push('/')
+                    useFileStore().reset()
+                    useLibraryStore().reset()
+                    useCameraStore().reset()
                     localStorage.clear()                
                     return true
                 }

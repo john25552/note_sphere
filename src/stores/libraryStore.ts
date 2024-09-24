@@ -43,15 +43,19 @@ export const useLibraryStore = defineStore('libraryStore', {
             }
       },
 
+      async refreshLibraries(){
+        this.initialized = false
+        await this.initialize()
+      },
+
       selectLibrary(targetId: string) {
         let targetLib = this.libraries.find(library => library.id == targetId)
 
         if(targetLib != undefined){
           this.selectedLibrary = {loaded: true, value: targetLib}
           this.deselectFolder()
-          console.log('loaded library ', targetLib)
         } else {
-          console.log("No such library ", targetLib)
+          useErrorStore().handleError(`Library not found`)
         }
       },
 
@@ -82,7 +86,6 @@ export const useLibraryStore = defineStore('libraryStore', {
           if(response.status == 201 || response.status == 200){
             let libraryData = response.data.library
 
-            console.log("Created library is ", libraryData)
 
             let library: Library = {
               name: libraryData.name,
@@ -92,7 +95,6 @@ export const useLibraryStore = defineStore('libraryStore', {
               files: libraryData.files
             }
 
-            console.log(library)
             
             this.libraries.push(library)
   
@@ -108,12 +110,10 @@ export const useLibraryStore = defineStore('libraryStore', {
       async createFolder (name: string) {
         try {
           let associated_library = this.selectedLibrary.value.id
-          console.log("Requesting for creation of library with id ", associated_library)
           let response = await api.post('folder/create', {name: name, associated_library: associated_library})
 
           if(response.status == 201 || response.status == 200){
             this.libraries.forEach(library => {
-              console.log("Created folder is ", response.data)
               if(library.id == response.data.associated_library.id){
                 library.folders.push(response.data)
               }

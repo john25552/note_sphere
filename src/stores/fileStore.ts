@@ -11,10 +11,10 @@ export const useFileStore = defineStore('fileStore', {
             menuState: { context: '', on: false },
             previewMode: true,
             loaded_file: {
-                name: "", type: {kind: '', format: ''}, body: '', id: '',
-                collaborators: [], associated_folder: '',
+                name: "", kind: '', body: '', id: '',
+                collaborators: [], associated_folder: '', size: 0,
                 owner: '', library: '', comments: [],
-                viewers: []
+                viewers: [], type: '', updatedAt: ''
             } as LocalFile,
             files: [] as LocalFile[],
             initialized: false // Flag to track initialization
@@ -30,7 +30,6 @@ export const useFileStore = defineStore('fileStore', {
                 let response = await api.get('file');
 
                 if (response.status == 201 || response.status == 200){
-                    console.log(response)
                     this.files = response.data;
                     this.initialized = true; // Mark as initialized after data is fetched
                 }
@@ -48,10 +47,10 @@ export const useFileStore = defineStore('fileStore', {
             this.menuState = { context: '', on: false },
             this.previewMode = true,
             this.loaded_file = {
-                name: "", type: {kind: '', format: ''}, body: '', id: '',
+                name: "", kind: '', body: '', id: '',
                 collaborators: [], associated_folder: '',
-                owner: '', library: '', comments: [],
-                viewers: []
+                owner: '', library: '', comments: [], size: 0,
+                viewers: [], type: '', updatedAt: ''
             } as LocalFile,
             this.files = [] as LocalFile[],
             this.initialized = false 
@@ -68,7 +67,6 @@ export const useFileStore = defineStore('fileStore', {
             }
 
             let selectedFile = this.files.find(file => file.name === file_name && file.id === file_id);
-            console.log('File to be loaded is: ', selectedFile)
 
             if (selectedFile) {
                 this.loaded_file = selectedFile;
@@ -130,10 +128,11 @@ export const useFileStore = defineStore('fileStore', {
             let file = new File([blob], name, {type: 'text/markdown'})
             let associated_library: string | undefined = '';
 
-            if(useLibraryStore().libraries.length < 1) {console.log(`There's no library, creating one`);associated_library = await useLibraryStore().createLibrary('Untitled Files Lib')}
+            if(useLibraryStore().libraries.length < 1) {
+                useErrorStore().handleWarning(`There's no library, creating one`);
+                associated_library = await useLibraryStore().createLibrary('Untitled Files Lib')}
 
             else {
-                console.log('This is the library store: ', useLibraryStore().libraries)
                 let untitledFilesLib = useLibraryStore().libraries.find(library => library.name == 'Untitled Files Lib')
 
                 if(untitledFilesLib){
@@ -145,11 +144,11 @@ export const useFileStore = defineStore('fileStore', {
 
             formData.append('file', file)
             formData.append('associated_folder', folder)
+            formData.append('kind', 'document')
 
             if(associated_library) formData.append('associated_library', associated_library)
 
             else {
-                console.log("Associated library is undefined")
                 return
             }
 
@@ -161,21 +160,25 @@ export const useFileStore = defineStore('fileStore', {
                 if (response.status == 201 || response.status == 200){
                     let responseFileData = response.data.file
 
-                    let creaatedFile: LocalFile = {
+                    let createdFile: LocalFile = {
                         name: responseFileData.name,
                         id: responseFileData.id,
                         owner: response.data.owner,
                         collaborators: responseFileData.collaborators,
-                        type: {kind: 'document', format: responseFileData.type},
+                        kind: 'document',
+                        type: responseFileData.type,
                         body: responseFileData.body,
                         associated_folder: responseFileData.associated_folder,
                         library: responseFileData.library,
                         comments: responseFileData.comments,
-                        viewers: responseFileData.viewers
+                        viewers: responseFileData.viewers,
+                        size: responseFileData.size,
+                        updatedAt: responseFileData.updatedAt
                     }
 
-                    this.files.push(creaatedFile);
-                    this.load_file(creaatedFile.name, creaatedFile.id);
+                    this.files.push(createdFile);
+                    await useLibraryStore().refreshLibraries()
+                    this.load_file(createdFile.name, createdFile.id);
                 }
                 
                 else throw new Error('File creation failed');
@@ -194,28 +197,14 @@ export const useFileStore = defineStore('fileStore', {
             formData.append('file', file)
             formData.append('associated_library', associated_library)
             formData.append('associated_folder', folder)
+            formData.append('kind', fileKind)
 
             try{
-                useErrorStore().handleWarning(`Library id is ${associated_library}`)
                 let response = await api.post('file/upload', formData)
 
                 if(response.status == 200 || response.status == 201){
-                    let responseFileData = response.data.file
-                    let uploadedFile: LocalFile = {
-                        name: responseFileData.name,
-                        id: responseFileData.id,
-                        owner: response.data.owner,
-                        collaborators: responseFileData.collaborators,
-                        type: {
-                            kind: fileKind,
-                            format: responseFileData.type
-                        },
-                        body: responseFileData.body,
-                        associated_folder: responseFileData.associated_folder,
-                        library: responseFileData.library,
-                        comments: responseFileData.comments,
-                        viewers: responseFileData.viewers
-                    }
+                    await useLibraryStore().refreshLibraries()
+                    this.files = response.data
                 }
             } catch(error){
                 useErrorStore().handleError(error)
@@ -246,10 +235,13 @@ export type LocalFile = {
     id: string;
     owner: string
     collaborators: { id: string}[];
-    type: {kind: string, format: string}
+    type: string
+    kind: string
     body: string
     associated_folder: string
     library: string
     comments: string[]
     viewers: string[]
+    size: number,
+    updatedAt: string
 };

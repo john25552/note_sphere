@@ -62,21 +62,21 @@
     let raw_content: Ref<string> = ref('');
     let preview: HTMLElement | null;
 
-    let md = markdownit({
-        html: true,
-        linkify: true,
-        typographer: true,
-        breaks: true,
-        highlight: function (str: any, lang: any) {
-            if (hljs.getLanguage(lang)) {
-                return '<pre><code class="hljs">' +
-                    hljs.highlight(str, { language: lang, ignoreIllegals: true }).value +
-                    '</code></pre>';
-            }
+    // let md = markdownit({
+    //     html: true,
+    //     linkify: true,
+    //     typographer: true,
+    //     breaks: true,
+    //     highlight: function (str: any, lang: any) {
+    //         if (hljs.getLanguage(lang)) {
+    //             return '<pre><code class="hljs">' +
+    //                 hljs.highlight(str, { language: lang, ignoreIllegals: true }).value +
+    //                 '</code></pre>';
+    //         }
 
             // return '<pre><code class="hljs">' + md.utils.escapeHtml(str) + '</code></pre>';
-        }
-    })
+    //     }
+    // })
 
     onMounted(()=> {
         initDropdowns();
