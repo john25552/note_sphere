@@ -44,7 +44,7 @@
                 </span>
             </div>
             <div class="hidden lg:mt-0 lg:col-span-5 lg:flex">
-                <img src="../../assets/original-fb41d37ce95d62afa154746de0be885f.png" alt="mockup">
+                <!-- <img src="../../assets/original-fb41d37ce95d62afa154746de0be885f.png" alt="mockup"> -->
             </div>                
             <div class="overlay hidden bg-gray-700/40 fixed top-0 bottom-0 left-0 right-0">
                 <svg id="cancel-overlay" class="w-6 h-6 text-white absolute right-1/3 top-[13%] cursor-pointer" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
