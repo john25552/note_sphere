@@ -24,7 +24,7 @@ export const useCameraStore = defineStore('cameraStore', {
             spaces: [] as Space[],
             creatingNewSharing: {on: false, tab: ''} as {on: boolean, tab: string},
             active_shared_tab: 'sharedFiles' as string,
-            is_sidePanel: {on: false, in_preview: ''} as {on: boolean, in_preview: string},
+            is_sidePanel: {on: true, in_preview: 'participants'} as {on: boolean, in_preview: string},
             navigateToMedia: false,
             initialized: false
         }
@@ -69,7 +69,7 @@ export const useCameraStore = defineStore('cameraStore', {
                     }
         
                     this.spaces.push(createdSpace)
-                    useSpaceSocketStore().createRoom(createdSpace.id)
+                    // useSpaceSocketStore().createRoom(createdSpace.id)
                 }
             } catch (error) {
               useErrorStore().handleError(error)

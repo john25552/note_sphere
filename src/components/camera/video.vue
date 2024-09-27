@@ -18,7 +18,7 @@
     let props = defineProps(['stream'])
 
     onMounted(() => {
-      let thisVideo = document.querySelector(`.${props.stream}`)
+      let thisVideo = document.querySelector('.remoteVideo')
       thisVideo.srcObject = props.stream;
       thisVideo?.addEventListener('click', ()=>{
         console.log('clicked')

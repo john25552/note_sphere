@@ -65,7 +65,7 @@ export const useSpaceSocketStore = defineStore('spaceSocketStore', {
       })
 
       this.socket?.on('candidate', data => {
-        let candidate = new RTCIceCandidate(data)
+        let candidate = new RTCIceCandidate(data.candidate)
         this.peerConnections[data.client].connection.addIceCandidate(candidate);
       })
   
@@ -161,6 +161,8 @@ export const useSpaceSocketStore = defineStore('spaceSocketStore', {
         }
   
         let localDesc = this.peerConnections[data.id].connection.localDescription
+
+        console.log("Yet another local sdp ", localDesc)
         this.socket?.emit('signal', {type: answer.type, sdp: localDesc})
   
       } else if(data.signalType == "answer") {
