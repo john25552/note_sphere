@@ -98,8 +98,10 @@ export const useSpaceSocketStore = defineStore('spaceSocketStore', {
           this.remoteStreams.push({remoteStream: event.streams[0]})
           console.log("added a remote track")
         }
-  
-        this.socket?.emit('signal', {signalType: offer.type, sdp: this.peerConnections[clientId].connection.localDescription, client: clientId})
+        let localSdp = this.peerConnections[clientId].connection.localDescription
+        console.log("Local sdp is ", localSdp)
+
+        this.socket?.emit('signal', {signalType: offer.type, sdp: localSdp, client: clientId})
       } catch(error) {
         console.log("Error while starting peer connection: ", error)
       }
