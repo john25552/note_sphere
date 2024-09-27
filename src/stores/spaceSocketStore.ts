@@ -11,7 +11,7 @@ export const useSpaceSocketStore = defineStore('spaceSocketStore', {
   state: () => {
     return{
       localStream: new MediaStream(),
-      remoteStreams: [] as {remoteStream: MediaStream}[],
+      remoteStreams: null as MediaStream | null,
       peerConnections: {} as Record<string, {connection: RTCPeerConnection}>,
       socket: null as Socket | null,
       cameraStore: useCameraStore(),
@@ -95,7 +95,7 @@ export const useSpaceSocketStore = defineStore('spaceSocketStore', {
         }
   
         this.peerConnections[clientId].connection.ontrack = (event) => {
-          this.remoteStreams.push({remoteStream: event.streams[0]})
+          this.remoteStreams = event.streams[0]
           console.log("added a remote track")
         }
         let localSdp = this.peerConnections[clientId].connection.localDescription
@@ -157,7 +157,7 @@ export const useSpaceSocketStore = defineStore('spaceSocketStore', {
         }
   
         this.peerConnections[data.client].connection.ontrack = (event) => {
-          this.remoteStreams.push({remoteStream: event.streams[0]})
+          this.remoteStreams = event.streams[0]
         }
   
         let localDesc = this.peerConnections[data.id].connection.localDescription

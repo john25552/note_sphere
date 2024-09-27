@@ -198,9 +198,7 @@
 
         <div>
           <ul>
-            <li v-for="(stream, index) in remoteStreams" :key="index" :stream="stream.remoteStream" :name="stream.name">
-              <videoElement/>
-            </li>
+            <videoElement v-if="remoteStreams" :stream="remoteStreams"/>
           </ul>
         </div>
       </div>
