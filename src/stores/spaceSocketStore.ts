@@ -1,10 +1,10 @@
 import { defineStore } from 'pinia';
 import { Socket, io } from 'socket.io-client';
-import { ref, type Ref } from 'vue';
-import { useErrorStore } from './errorStore';
-import { useAccountStore } from './account';
+// import { ref, type Ref } from 'vue';
+// import { useErrorStore } from './errorStore';
+// import { useAccountStore } from './account';
+// import { useHomeStore } from './homeStore';
 import { useCameraStore, type Space } from './cameraStore';
-import { useHomeStore } from './homeStore';
 import type { Message } from './inboxStore';
 
 export const useSpaceSocketStore = defineStore('spaceSocketStore', {
@@ -105,31 +105,31 @@ export const useSpaceSocketStore = defineStore('spaceSocketStore', {
       }
     },
 
-    // Takes space id to use as room name
-    async createRoom(roomName: string) {
-      try {
-        this.socket = io("https://notesphere-sys-production.up.railway.app/space", {transports: ['websocket'], withCredentials: true})
-        // this.socket = io("http://localhost:3000/space", {transports: ['websocket'], withCredentials: true })
-        this.socket.emit('create_room', {room: roomName})
+    // // Takes space id to use as room name
+    // async createRoom(roomName: string) {
+    //   try {
+    //     this.socket = io("https://notesphere-sys-production.up.railway.app/space", {transports: ['websocket'], withCredentials: true})
+    //     // this.socket = io("http://localhost:3000/space", {transports: ['websocket'], withCredentials: true })
+    //     this.socket.emit('create_room', {room: roomName})
 
-        this.socket.on('message', (data) => {
-          let dataObj = data.createdMessage
-          let message: Message = {
-            body: dataObj.body,
-            sender: dataObj.sender,
-            receiver: dataObj.receiver,
-            sentAt: dataObj.sentAt,
-            id: dataObj.id,
-            owner: data.owner,
-            target: dataObj.target
-          }
+    //     this.socket.on('message', (data) => {
+    //       let dataObj = data.createdMessage
+    //       let message: Message = {
+    //         body: dataObj.body,
+    //         sender: dataObj.sender,
+    //         receiver: dataObj.receiver,
+    //         sentAt: dataObj.sentAt,
+    //         id: dataObj.id,
+    //         owner: data.owner,
+    //         target: dataObj.target
+    //       }
 
-          this.cameraStore.pushMessage(message)
-        })
-      } catch (error) {
-        useErrorStore().handleError(error)
-      }
-    },
+    //       this.cameraStore.pushMessage(message)
+    //     })
+    //   } catch (error) {
+    //     useErrorStore().handleError(error)
+    //   }
+    // },
   
     async handleServerSignal(data: any) {
       console.log("Got sinal: ", data)
