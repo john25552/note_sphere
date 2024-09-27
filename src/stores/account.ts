@@ -10,7 +10,7 @@ import { useHomeStore } from './homeStore'
 export const useAccountStore = defineStore('accountStore', {
     state: ()=> {
         return {
-            user: null,
+            user: null as {name: string, email_address: string} | null,
             sideBarState: false,
             router: useRouter()
         }

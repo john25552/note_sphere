@@ -93,15 +93,15 @@
         <div class="flex-grow relative overflow-hidden">
           <!-- Shared files list -->
           <ul v-if="active_shared_tab == 'sharedFiles'" class="space-y-2 p-2">
-            <li v-for="(file, index) in loadedSpace.sharedFiles" :key="index">
+            <li v-for="(file, index) in loadedSpace?.sharedFiles" :key="index">
               <shared_file :date="file.date" :size="file.size" :title="file.title"/>
             </li>
           </ul>
 
           <!-- Pins list -->
           <ul v-if="active_shared_tab == 'pinned'" class="overflow-y-auto scrollbar-hide absolute top-0 bottom-0 space-y-2">
-            <li v-for="(pin, index) in loadedSpace.spacePins" :key="index">
-              <pin :title="pin.title" :content="pin.content" :pin-type="pin.type" :index="index" :arrLen="loadedSpace.spacePins.length"/>
+            <li v-for="(pin, index) in loadedSpace.pins" :key="index">
+              <pin :title="pin.title" :content="pin.content" :pin-type="pin.type" :index="index" :arrLen="loadedSpace.pins.length"/>
             </li>
           </ul>
 
@@ -157,9 +157,9 @@
           >
             <div class="space-y-4 px-4 py-2 items-end">
               <spaceMessage
-                v-for="(message, index) in loadedSpace.space_messages"
+                v-for="(message, index) in loadedSpace?.messages"
                 :key="index"
-                :message="message.body"
+                :message="message.value"
                 :sender="message.sender"
               />
             </div>
@@ -219,10 +219,12 @@ import videoElement from '@/components/camera/video.vue'
 
 import { initTooltips } from 'flowbite'
 import { useInnerRouter } from '@/stores/router'
-import { useCameraStore } from '@/stores/cameraStore'
+import { useCameraStore, type Space } from '@/stores/cameraStore'
 import { useSpaceSocketStore } from '@/stores/spaceSocketStore'
 import { useAccountStore } from '@/stores/account'
 import { computed, onMounted } from 'vue'
+import { ref } from 'vue'
+import type { Ref } from 'vue'
 
 let items = [{ name: 'channel 45' }, { name: 'Hello world' }]
 let shared_panel: HTMLElement | null
@@ -230,21 +232,23 @@ let side_panel: HTMLElement | null
 let innerRouter = useInnerRouter()
 let cameraStore = useCameraStore()
 let spaceSocketStore = useSpaceSocketStore()
-let accountStore = useAccountStore()
 let localStream = computed(() => spaceSocketStore.localStream)
 let remoteStreams = computed(() => spaceSocketStore.remoteStreams)
 let isSidePanel = computed(() => cameraStore.is_sidePanel)
 let loadedSpace = computed(() => cameraStore.loaded_space)
+let spaces = computed(() => cameraStore.spaces)
 let active_shared_tab = computed(() => cameraStore.active_shared_tab)
 let creatingNewSharing = computed(() => cameraStore.creatingNewSharing)
 let localVideo;
 
 let routerLevel = computed(() => innerRouter.getLevel())
 let shared_panel_tabs: NodeListOf<Element> | null
+// let loadedSpaceValue:Ref<Space> = ref();
 
 // When the component is mounted, the BreadCrumb is rebuilt, and functions that
 // manage click events and message scroll effects, i.e, attachToggleListner and attachScrollListener are evoked
 onMounted(async () => {
+  cameraStore.disableMediaNavigation()
   innerRouter.rebuild('Camera')
   initTooltips()
   shared_panel = document.querySelector('.shared_panel')
@@ -252,8 +256,12 @@ onMounted(async () => {
   shared_panel_tabs = document.querySelectorAll('.shared_panel_tab')
   localVideo = document.querySelector("#localVideo")
 
-  await spaceSocketStore.startCall(accountStore.user?.email_address)
-  localVideo.srcObject = localStream.value
+  // loadedSpaceValue.value = spaces.value.find(space => space.id == loadedSpace.value)
+  // if(loadedSpaceValue.value)
+
+    await spaceSocketStore.startCall()
+
+    localVideo.srcObject = localStream.value
 
   attachToggleListner()
   attachScrollListner()

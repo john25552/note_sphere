@@ -5,7 +5,8 @@
                 <svg class="absolute w-10 h-10 text-gray-400 -left-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path></svg>
             </div>
             <img v-if="image" class="w-10 h-10 rounded-full" src="" alt="Rounded avatar">
-            <span class="font-bold text-xl">Name</span>
+            <span v-if="loadedChat?.name" class="font-bold text-xl">{{ loadedChat?.name }}</span>
+            <span v-else class="font-bold text-xl">{{ loadedChat?.id }}</span>
         </div>
 
         <div class="space-x-2 flex items-center">
@@ -20,6 +21,11 @@
 </template>
 
 <script setup lang="ts">
+import { useInboxStore } from '@/stores/inboxStore';
+import { computed } from 'vue';
+
+    let inboxStore = useInboxStore()
+    let loadedChat = computed(() => inboxStore.loadedChat)
     let image = false
 
 </script>

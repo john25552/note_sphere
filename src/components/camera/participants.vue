@@ -15,9 +15,18 @@
 </template>
 
 <script setup lang="ts">
-    import { useCameraStore } from '@/stores/cameraStore'
-    import { computed } from 'vue';
+    import { useCameraStore, type Participant } from '@/stores/cameraStore'
+    import { computed, onMounted, ref, type Ref } from 'vue';
 
     let cameraStore = useCameraStore()
-    let participants = computed(() => cameraStore.loaded_space.participants)
+    let loadedSpace = computed(() => cameraStore.loaded_space)
+    let spaces = computed(() => cameraStore.spaces)
+    let participants: Ref<Participant[]> = ref([]);
+
+    onMounted(() => {
+        let loadedSpaceValue = spaces.value.find(space => space.id == loadedSpace.value)
+
+        if(loadedSpaceValue)
+            participants.value = loadedSpaceValue.participants
+    })
 </script>

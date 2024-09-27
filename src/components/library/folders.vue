@@ -134,7 +134,7 @@
     let selectedLibrary = computed(() => libraryStore.selectedLibrary)
     let selectedTab = computed(() => libraryStore.selectedLibtab)
     let selectedFolder = computed(() => libraryStore.selectedFolder)
-    let files = computed(() => fileStore.files)
+    let files = computed(() => fileStore.files.length)
 
     let filterate = ref({
         videos: [] as unknown as LocalFile[],
@@ -153,6 +153,7 @@
     })
 
     watch(files, (value)=>{
+        console.log("File length changed")
         searchFiles()
     })
 
@@ -162,7 +163,7 @@
 
     let searchFiles = ()=> {
         folderFiles.value = []
-        files.value.forEach((file: LocalFile) => {
+        selectedLibrary.value.value.files.forEach((file: LocalFile) => {
             if(file.associated_folder == selectedFolder.value.id){
                 folderFiles.value.push(file)
             }

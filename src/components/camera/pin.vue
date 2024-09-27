@@ -20,11 +20,5 @@
 </template>
 
 <script setup lang="ts">
-    let props = defineProps({
-        pinType: String,
-        content: String,
-        title: String,
-        index: Number,
-        arrLen: Number
-    })
+    let props = defineProps(['pinType', 'content', 'title', 'index', 'arrLen'])
 </script>

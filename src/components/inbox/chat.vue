@@ -10,10 +10,10 @@
             </div>
             <div class="flex-1 min-w-0 ms-4">
                 <p class="text-sm font-medium text-gray-900 truncate dark:text-white">
-                    Account Name
+                    {{ props.name }}
                 </p>
                 <p class="text-sm text-gray-500 truncate dark:text-gray-400">
-                    Message
+                    {{ props.recentMessage?.body }}
                 </p>
             </div>
             <div class="inline-flex items-center text-base font-semibold text-gray-900 dark:text-white">
@@ -25,9 +25,7 @@
 
 <script setup lang="ts">
 
-    const props = defineProps(['chatInfo', 'index'])
+    const props = defineProps(['name', 'recentMessage'])
 
-    const chat = props.chatInfo
-    const index = props.index
     const image = false
 </script>

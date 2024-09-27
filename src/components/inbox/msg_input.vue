@@ -1,5 +1,5 @@
 <template>
-    <form>
+    <form @submit.prevent="sendMessage">
         <label for="chat" class="sr-only">Your message</label>
         <div class="flex items-center px-3 py-2 bg-gray-50 dark:bg-gray-700" :class="{'bg-transparent' : space_loaded}">
             <button v-if="!space_loaded" type="button" class="inline-flex justify-center p-2 text-gray-500 rounded-lg cursor-pointer hover:text-gray-900 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-600">
@@ -16,8 +16,8 @@
                 </svg>
                 <span class="sr-only">Add emoji</span>
             </button>
-            <textarea id="chat" :class="{'mx-1': space_loaded}" rows="1" class="block mx-4 p-2.5 w-full text-sm text-gray-900 bg-white rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Your message..."></textarea>
-                <button type="submit" class="inline-flex justify-center p-2 text-blue-600 rounded-full cursor-pointer hover:bg-blue-100 dark:text-blue-500 dark:hover:bg-gray-600">
+            <textarea v-model="messageBody" id="chat" :class="{'mx-1': space_loaded}" rows="1" class="block mx-4 p-2.5 w-full text-sm text-gray-900 bg-white rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Your message..."></textarea>
+            <button type="submit" class="inline-flex justify-center p-2 text-blue-600 rounded-full cursor-pointer hover:bg-blue-100 dark:text-blue-500 dark:hover:bg-gray-600" :disabled="messageBody.length < 0">
                 <svg class="w-5 h-5 rotate-90 rtl:-rotate-90" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 18 20">
                     <path d="m17.914 18.594-8-18a1 1 0 0 0-1.828 0l-8 18a1 1 0 0 0 1.157 1.376L8 18.281V9a1 1 0 0 1 2 0v9.281l6.758 1.689a1 1 0 0 0 1.156-1.376Z"/>
                 </svg>
@@ -28,10 +28,37 @@
 </template>
 
 <script setup lang="ts">
-    import { useCameraStore } from '@/stores/cameraStore';
-import { computed } from 'vue';
+    import { useAccountStore } from '@/stores/account';
+import { useCameraStore } from '@/stores/cameraStore';
+import { useErrorStore } from '@/stores/errorStore';
+    import { useInboxStore, type Message } from '@/stores/inboxStore';
+    import { computed, ref } from 'vue';
 
     let cameraStore = useCameraStore()
+    let inboxStore = useInboxStore()
+    let user = useAccountStore().user
     let space_loaded = computed(() => cameraStore.loaded_space)
+
+    let messageBody = ref('')
+
+    let sendMessage = async ()=> {
+        if(messageBody.value.length > 0 && inboxStore.loadedChat){
+            let message = {
+                body: messageBody.value,
+                sender_id: user?.email_address,
+                receiver_id: inboxStore.loadedChat?.id,
+                type: "Private"
+            }
+            await inboxStore.sendMessage(message)
+        } else {
+            if(messageBody.value.length < 1)
+                useErrorStore().handleError("Can't send empty message")
+
+            else
+                useErrorStore().handleError("No loaded chat, can't send message")
+        }
+
+        messageBody.value = ''
+    }
 
 </script>

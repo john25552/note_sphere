@@ -5,9 +5,9 @@
         <div v-if="errorStore.message" class="p-2 z-50 absolute top-0 left-16 right-16 flex flex-col justify-center items-center  bg-slate-800 bg-opacity-75 rounded-md">
             <span class="text-red-500 font-bold text-lg">Error:</span>
             <div class="flex flex-col space-y-1 text-white">
-                <span v-if="errorStore.statusText">{{ errorStore.statusText }} error with status code {{ errorStore.status }} occured</span>
-                <span>Reason: {{ errorStore.message }}</span>
-                <span v-if="!errorStore.status">{{ errorStore.error }}</span>
+                <span v-if="errorStore.statusText" class="text-white">{{ errorStore.statusText }} error with status code {{ errorStore.status }} occured</span>
+                <span class="text-white">Reason: {{ errorStore.message }}</span>
+                <span v-if="!errorStore.status" class="text-white">{{ errorStore.error }}</span>
             </div>
         </div>
 

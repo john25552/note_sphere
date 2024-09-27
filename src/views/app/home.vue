@@ -117,27 +117,27 @@
                 <!-- Home collection -->
                 <div>
                     <!-- Home menu(tabs) -->
-                    <div class="sticky top-0 bg-white text-sm font-medium text-center text-gray-500 border-b border-gray-200 shadow-sm shadow-gray-300 dark:text-gray-400 dark:border-gray-700">
+                    <div class="sticky z-20 top-0 bg-white text-sm font-medium text-center text-gray-500 border-b border-gray-200 shadow-sm shadow-gray-300 dark:text-gray-400 dark:border-gray-700">
                         <ul class="flex flex-wrap -mb-px">
                             <li @click="homeNavigator('feed')" class="me-2 cursor-pointer">
-                                <span id="feed" class="homeTab inactiveHomeTab inline-block p-4 border-b-2 rounded-t-lg">Feed</span>
+                                <span id="feed" class="homeTab inline-block p-4 border-b-2 rounded-t-lg" :class="{'activeHomeTab': activeTab == 'feed', 'inactiveHomeTab': activeTab != 'feed'}">Feed</span>
                             </li>
                             <li @click="homeNavigator('spaces')" class="me-2 cursor-pointer">
-                                <span id="spaces" class="homeTab inactiveHomeTab inline-block p-4 border-b-2 rounded-t-lg" aria-current="page">Spaces</span>
+                                <span id="spaces" class="homeTab inline-block p-4 border-b-2 rounded-t-lg" :class="{'activeHomeTab': activeTab == 'spaces', 'inactiveHomeTab': activeTab != 'spaces'}" aria-current="page">Spaces</span>
                             </li>
                             <li @click="homeNavigator('libraries')" class="me-2 cursor-pointer">
-                                <span id="libraries" class="homeTab inactiveHomeTab inline-block p-4 border-b-2 rounded-t-lg">Libraries</span>
+                                <span id="libraries" class="homeTab inline-block p-4 border-b-2 rounded-t-lg" :class="{'activeHomeTab': activeTab == 'libraries', 'inactiveHomeTab': activeTab != 'libraries'}">Libraries</span>
                             </li>
                             <li @click="homeNavigator('challenges')" class="me-2 cursor-pointer">
-                                <span id="challenges" class="homeTab inactiveHomeTab inline-block p-4 border-b-2 rounded-t-lg">Challenges</span>
+                                <span id="challenges" class="homeTab inline-block p-4 border-b-2 rounded-t-lg" :class="{'activeHomeTab': activeTab == 'challenges', 'inactiveHomeTab': activeTab != 'challenges'}">Challenges</span>
                             </li>
                             <li @click="homeNavigator('notifications')" class="cursor-pointer">
-                                <span id="notifications" class="homeTab inactiveHomeTab inline-block p-4 border-b-2 rounded-t-lg">Notifications</span>
+                                <span id="notifications" class="homeTab inline-block p-4 border-b-2 rounded-t-lg" :class="{'activeHomeTab': activeTab == 'notifications', 'inactiveHomeTab': activeTab != 'notifications'}">Notifications</span>
                             </li>
                         </ul>
                     </div>
 
-                    <div>
+                    <div class="relative">
                         <spaces v-if="activeTab == 'spaces'"/>
                         <feed v-if="activeTab == 'feed'"/>
                     </div>
@@ -188,9 +188,13 @@
     import { useInnerRouter } from '@/stores/router';
     import { useHomeStore }from '@/stores/homeStore'
     import { computed, onMounted } from 'vue';
+    import { useCameraStore } from '@/stores/cameraStore';
+    import { watch } from 'vue';
+    import router from '@/router';
 
     let innerRouter = useInnerRouter();
     let homeStore = useHomeStore()
+    let cameraStore = useCameraStore()
     let url = computed(() => innerRouter.ulrContainer)
     let inCreation = computed(() => homeStore.creating_new)
     let activeTab = computed(() => homeStore.activeTab)
@@ -198,14 +202,15 @@
     let items = [{}, {}, {}]
     let item = [{}, {}, {}, {}, {}, {}, {}]
 
-    let homeTabs: HTMLElement[] | null; 
+    let homeTabs: NodeListOf<Element> | { id: string; }[]; 
+    let navigateToMedia = computed(() => cameraStore.navigateToMedia)
 
-    onMounted(() => {
+    onMounted(async () => {
         innerRouter.rebuild("Home")
-        homeTabs = document.querySelectorAll(".homeTab");
-        let initTab = document.querySelector("#feed");
-        innerRouter.push("feed")
-        initTab?.parentElement?.dispatchEvent(new Event('click'));
+        homeTabs = document.querySelectorAll('.homeTab')
+        homeStore.initialize()
+        console.log("Here at home")
+        await cameraStore.initialize()
     })
 
     // The create new dropdown controller
@@ -218,17 +223,15 @@
         }
     }
 
+    watch(navigateToMedia, (value)=>{
+        if(value)
+            router.push({name: 'create-media'})
+    })
+
     // Bread crumb handler of the home page
     let homeNavigator = (tabName: string) => {
-        homeTabs?.forEach(tab => {
-            if(tab.classList.contains("activeHomeTab")){
-                tab.classList.replace("activeHomeTab", "inactiveHomeTab")
-            }
-        })
-
-        homeTabs?.forEach(tab => {
+        homeTabs?.forEach((tab: { id: string; }) => {
             if(tab.id == tabName){
-                tab.classList.replace("inactiveHomeTab","activeHomeTab")
                 innerRouter.replaceLast(tabName)
                 homeStore.activateTab(tabName)
             }

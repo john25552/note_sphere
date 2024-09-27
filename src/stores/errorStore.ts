@@ -13,16 +13,16 @@ export const useErrorStore = defineStore('errorStore', {
     actions: {
         handleError(error: any) {
             if (error.response) {
-                console.error("Error Response:", error.response);
+                console.error("Error Response:", error);
                 this.status = error.response.status
                 this.statusText = error.response.statusText
                 this.message = error.response.data.message
             } else if (error.request) {
-                console.error("No Response:", error.request);
+                console.error("No Response:", error);
                 this.message = "No response from server"
                 this.status = 500
             } else {
-                console.error("Error:", error.message);
+                console.error("Error:", error);
                 this.error = error
                 this.message = "An error occurred during setup"
             }
