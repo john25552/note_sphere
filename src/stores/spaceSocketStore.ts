@@ -75,32 +75,31 @@ export const useSpaceSocketStore = defineStore('spaceSocketStore', {
   
     },
   
-    async createConnection(clientInfo: {clientId: string, room: string}) {
-      let client = clientInfo.clientId
+    async createConnection(clientId: string) {
       try{
-        this.peerConnections[client] = {connection: new RTCPeerConnection(this.configuration)}
+        this.peerConnections[clientId] = {connection: new RTCPeerConnection(this.configuration)}
   
         this.localStream = await navigator.mediaDevices.getUserMedia({video: true, audio: true})
   
         this.localStream.getTracks().forEach(track => {
-          this.peerConnections[client].connection.addTrack(track, this.localStream)
+          this.peerConnections[clientId].connection.addTrack(track, this.localStream)
         })
   
-        let offer = await this.peerConnections[client].connection.createOffer()
-        await this.peerConnections[client].connection.setLocalDescription(offer)
+        let offer = await this.peerConnections[clientId].connection.createOffer()
+        await this.peerConnections[clientId].connection.setLocalDescription(offer)
   
-        this.peerConnections[client].connection.onicecandidate = (event) => {
+        this.peerConnections[clientId].connection.onicecandidate = (event) => {
           if(event.candidate){
-            this.socket?.emit('candidate', {signalType: 'candidate', candidate: event.candidate, room: clientInfo.room, client: client})
+            this.socket?.emit('candidate', {signalType: 'candidate', candidate: event.candidate, client: clientId})
           }
         }
   
-        this.peerConnections[client].connection.ontrack = (event) => {
+        this.peerConnections[clientId].connection.ontrack = (event) => {
           this.remoteStreams.push({remoteStream: event.streams[0]})
           console.log("added a remote track")
         }
   
-        this.socket?.emit('signal', {signalType: offer.type, sdp: this.peerConnections[client].connection.localDescription, room: clientInfo.room, client: client})
+        this.socket?.emit('signal', {signalType: offer.type, sdp: this.peerConnections[clientId].connection.localDescription, client: clientId})
       } catch(error) {
         console.log("Error while starting peer connection: ", error)
       }
@@ -109,8 +108,8 @@ export const useSpaceSocketStore = defineStore('spaceSocketStore', {
     // Takes space id to use as room name
     async createRoom(roomName: string) {
       try {
-        // this.socket = io("https://notesphere-sys-production.up.railway.app/space", {transports: ['websocket'], withCredentials: true})
-        this.socket = io("http://localhost:3000/space", {transports: ['websocket'], withCredentials: true })
+        this.socket = io("https://notesphere-sys-production.up.railway.app/space", {transports: ['websocket'], withCredentials: true})
+        // this.socket = io("http://localhost:3000/space", {transports: ['websocket'], withCredentials: true })
         this.socket.emit('create_room', {room: roomName})
 
         this.socket.on('message', (data) => {
