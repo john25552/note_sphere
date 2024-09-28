@@ -190,6 +190,7 @@ export const useInboxStore = defineStore('inboxStore', {
                                     target: responseData.target
                                 }
                                 chat.messages.push(message)
+                                chat.messages = chat.messages
                             }
                         })
                     })
@@ -222,6 +223,7 @@ export const useInboxStore = defineStore('inboxStore', {
                                 target: responseData.target
                             }
                             chat.messages.push(message)
+                            chat.messages = chat.messages
                         }
                     })
                 })

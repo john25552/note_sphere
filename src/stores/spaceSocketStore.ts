@@ -136,7 +136,7 @@ export const useSpaceSocketStore = defineStore('spaceSocketStore', {
     //   }
     // },
   
-    async handleServerSignal(data: any) {
+    async handleServerSignal(data: {signalType: string, sdp: any, client: string}) {
       console.log("Got sinal: ", data)
       if (data.signalType == "offer") {
         console.log("It's an offer")
@@ -160,6 +160,7 @@ export const useSpaceSocketStore = defineStore('spaceSocketStore', {
         }
   
         this.peerConnection.ontrack = (event) => {
+          console.log("Got remote track")
           this.remoteStreams = event.streams[0]
         }
   
