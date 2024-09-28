@@ -40,7 +40,26 @@ export const useInboxStore = defineStore('inboxStore', {
                         myChats.push(chat)
                     })
                     
-                    this.chats = myChats
+                    let sortChats = ()=> {
+                        let sortedChats: Chat[] = []
+                        if(myChats.length > 1){
+                            sortedChats = myChats.sort((a, b) => {
+                                // Get the latest message in each chat (assuming messages array is not empty)
+                                const lastMessageA = a.messages?.[a.messages.length - 1]?.sentAt || '';
+                                const lastMessageB = b.messages?.[b.messages.length - 1]?.sentAt || '';
+                
+                                // Convert sentAt to Date objects for comparison
+                                return new Date(lastMessageB).getTime() - new Date(lastMessageA).getTime();
+                            })
+                        }
+                
+                        else 
+                            sortedChats = myChats
+                
+                        return sortedChats
+                    }
+
+                    this.chats = sortChats()
                 }
                 
                 
@@ -95,8 +114,29 @@ export const useInboxStore = defineStore('inboxStore', {
         async getChats() {
             try {
                 let response = await api.get('chat')
-                if(response.status == 200 || response.status == 210)
-                    this.chats = response.data
+                if(response.status == 200 || response.status == 210){
+                    let sortChats = ()=> {
+                        let sortedChats: Chat[] = []
+                        if(response.data.length > 1){
+                            sortedChats = response.data.sort((a: Chat, b: Chat) => {
+                                // Get the latest message in each chat (assuming messages array is not empty)
+                                const lastMessageA = a.messages?.[a.messages.length - 1]?.sentAt || '';
+                                const lastMessageB = b.messages?.[b.messages.length - 1]?.sentAt || '';
+                
+                                // Convert sentAt to Date objects for comparison
+                                return new Date(lastMessageB).getTime() - new Date(lastMessageA).getTime();
+                            })
+                        }
+                
+                        else 
+                            sortedChats = response.data
+                
+                        return sortedChats
+                    }
+
+                    this.chats = sortChats()
+                }
+
             } catch (error) {
                 useErrorStore().handleError(error)
             }
@@ -115,7 +155,27 @@ export const useInboxStore = defineStore('inboxStore', {
                         owner: response.data.owner,
                         participants: responseData.participants
                     }
-                    this.chats.push(newChat)   
+                    this.chats.push(newChat)  
+                    let sortChats = ()=> {
+                        let sortedChats: Chat[] = []
+                        if(this.chats.length > 1){
+                            sortedChats = this.chats.sort((a, b) => {
+                                // Get the latest message in each chat (assuming messages array is not empty)
+                                const lastMessageA = a.messages?.[a.messages.length - 1]?.sentAt || '';
+                                const lastMessageB = b.messages?.[b.messages.length - 1]?.sentAt || '';
+                
+                                // Convert sentAt to Date objects for comparison
+                                return new Date(lastMessageB).getTime() - new Date(lastMessageA).getTime();
+                            })
+                        }
+                
+                        else 
+                            sortedChats = this.chats
+                
+                        return sortedChats
+                    }
+ 
+                    this.chats = sortChats()
                 }
 
                 // if (!this.socket) {

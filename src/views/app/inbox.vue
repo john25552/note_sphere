@@ -94,7 +94,7 @@
 
                 <div class="absolute top-0 bottom-0 w-full overflow-y-auto">
                     <ul v-if="chats.length > 0" role="list" class="divide-y divide-gray-200 dark:divide-gray-700 mt-10">
-                        <li @click="inboxStore.loadChat(chat.id)" v-for="(chat, index) in sortChats()" :key="index" :class="{'hidden': chat.name == useAccountStore().user?.email_address}">
+                        <li @click="inboxStore.loadChat(chat.id)" v-for="(chat, index) in chats" :key="index" :class="{'hidden': chat.name == useAccountStore().user?.email_address}">
                             <chat :name="chat.name" :recent-message="chat.messages?.find((value, index) => index === chat.messages.length-1)"/>
                         </li>
                     </ul>
@@ -164,25 +164,6 @@
         navigateCreateButton()
     }
 
-    let sortChats = ()=> {
-        let sortedChats: Chat[] = []
-        if(chats.value.length > 1){
-            console.log(chats.value.length)
-            sortedChats = chats.value.sort((a, b) => {
-                // Get the latest message in each chat (assuming messages array is not empty)
-                const lastMessageA = a.messages?.[a.messages.length - 1]?.sentAt || '';
-                const lastMessageB = b.messages?.[b.messages.length - 1]?.sentAt || '';
-
-                // Convert sentAt to Date objects for comparison
-                return new Date(lastMessageB).getTime() - new Date(lastMessageA).getTime();
-            })
-        }
-
-        else 
-            sortedChats = chats.value
-
-        return chats.value
-    }
 
     let navigateCreateButton = ()=> {
         let button = document.getElementById('dropdownUsersButton')
