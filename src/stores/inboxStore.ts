@@ -176,6 +176,7 @@ export const useInboxStore = defineStore('inboxStore', {
                     }
  
                     this.chats = sortChats()
+                    this.loadedChat = newChat
                 }
 
                 // if (!this.socket) {
