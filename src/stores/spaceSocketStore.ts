@@ -12,7 +12,7 @@ export const useSpaceSocketStore = defineStore('spaceSocketStore', {
     return{
       localStream: new MediaStream(),
       remoteStreams: null as MediaStream | null,
-      peerConnections: {} as Record<string, {connection: RTCPeerConnection}>,
+      peerConnection: new RTCPeerConnection as  RTCPeerConnection,
       socket: null as Socket | null,
       cameraStore: useCameraStore(),
       configuration: {
@@ -36,7 +36,7 @@ export const useSpaceSocketStore = defineStore('spaceSocketStore', {
       // }
   
       this.socket?.on('new_client', async (clientId: any) => {
-        console.log("Got another member ", clientId)
+        console.log("Got a new member ", clientId)
         await this.createConnection(clientId)
       })
 
@@ -66,7 +66,7 @@ export const useSpaceSocketStore = defineStore('spaceSocketStore', {
 
       this.socket?.on('candidate', data => {
         let candidate = new RTCIceCandidate(data.candidate)
-        this.peerConnections[data.client].connection.addIceCandidate(candidate);
+        this.peerConnection.addIceCandidate(candidate);
       })
   
       this.socket?.on('exception', async(data) => {
@@ -77,28 +77,28 @@ export const useSpaceSocketStore = defineStore('spaceSocketStore', {
   
     async createConnection(clientId: string) {
       try{
-        this.peerConnections[clientId] = {connection: new RTCPeerConnection(this.configuration)}
+        this.peerConnection =  new RTCPeerConnection(this.configuration)
   
         this.localStream = await navigator.mediaDevices.getUserMedia({video: true, audio: true})
   
         this.localStream.getTracks().forEach(track => {
-          this.peerConnections[clientId].connection.addTrack(track, this.localStream)
+          this.peerConnection.addTrack(track, this.localStream)
         })
   
-        let offer = await this.peerConnections[clientId].connection.createOffer()
-        await this.peerConnections[clientId].connection.setLocalDescription(offer)
+        let offer = await this.peerConnection.createOffer()
+        await this.peerConnection.setLocalDescription(offer)
   
-        this.peerConnections[clientId].connection.onicecandidate = (event) => {
+        this.peerConnection.onicecandidate = (event) => {
           if(event.candidate){
             this.socket?.emit('candidate', {signalType: 'candidate', candidate: event.candidate, client: clientId})
           }
         }
   
-        this.peerConnections[clientId].connection.ontrack = (event) => {
+        this.peerConnection.ontrack = (event) => {
           this.remoteStreams = event.streams[0]
           console.log("added a remote track")
         }
-        let localSdp = this.peerConnections[clientId].connection.localDescription
+        let localSdp = this.peerConnection.localDescription
         console.log("Local sdp is ", localSdp)
 
         this.socket?.emit('signal', {signalType: offer.type, sdp: localSdp, client: clientId})
@@ -137,30 +137,30 @@ export const useSpaceSocketStore = defineStore('spaceSocketStore', {
       console.log("Got sinal: ", data)
       if (data.signalType == "offer") {
         console.log("It's an offer")
-        this.peerConnections[data.id] = {connection: new RTCPeerConnection(this.configuration)}
+        this.peerConnection =  new RTCPeerConnection(this.configuration)
   
         let sessionDescription = new RTCSessionDescription(data.sdp);
-        await this.peerConnections[data.client].connection.setRemoteDescription(sessionDescription);
+        await this.peerConnection.setRemoteDescription(sessionDescription);
   
         this.localStream = await navigator.mediaDevices.getUserMedia({video: true, audio: true})
         this.localStream.getTracks().forEach(track => {
-          this.peerConnections[data.client].connection.addTrack(track);
+          this.peerConnection.addTrack(track);
         })
   
-        let answer = await this.peerConnections[data.client].connection.createAnswer()
-        await this.peerConnections[data.client].connection.setLocalDescription(answer)
+        let answer = await this.peerConnection.createAnswer()
+        await this.peerConnection.setLocalDescription(answer)
   
-        this.peerConnections[data.client].connection.onicecandidate = (event) => {
+        this.peerConnection.onicecandidate = (event) => {
           if(event.candidate){
             this.socket?.emit('candidate', {signalType: 'candidate', candidate: event.candidate, client: data.client})
           }
         }
   
-        this.peerConnections[data.client].connection.ontrack = (event) => {
+        this.peerConnection.ontrack = (event) => {
           this.remoteStreams = event.streams[0]
         }
   
-        let localDesc = this.peerConnections[data.id].connection.localDescription
+        let localDesc = this.peerConnection.localDescription
 
         console.log("Yet another local sdp ", localDesc)
         this.socket?.emit('signal', {type: answer.type, sdp: localDesc})
@@ -169,7 +169,7 @@ export const useSpaceSocketStore = defineStore('spaceSocketStore', {
         console.log("It's an anser")
 
         let sessionDescription = new RTCSessionDescription(data.sdp);
-        await this.peerConnections[data.client].connection.setRemoteDescription(sessionDescription)
+        await this.peerConnection.setRemoteDescription(sessionDescription)
   
       }
     }
