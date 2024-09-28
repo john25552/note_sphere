@@ -65,7 +65,10 @@ export const useSpaceSocketStore = defineStore('spaceSocketStore', {
       })
 
       this.socket?.on('candidate', data => {
+        console.log("Got a candidate signal", data)
         let candidate = new RTCIceCandidate(data.candidate)
+        console.log("Candidate to add is ", candidate) 
+
         this.peerConnection.addIceCandidate(candidate);
       })
   
