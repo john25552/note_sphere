@@ -69,7 +69,7 @@ export const useInboxStore = defineStore('inboxStore', {
                                 owner: data.owner,
                                 target: createdMessage.target
                             }
-                            targetChat?.messages.push(message)
+                            this.loadedChat?.messages.push(message)
                         })
                     }
                 }
@@ -140,6 +140,7 @@ export const useInboxStore = defineStore('inboxStore', {
                                     target: responseData.target
                                 }
                                 chat.messages.push(message)
+                                this.loadedChat?.messages.push(message)
                             }
                         })
                     })
@@ -189,7 +190,7 @@ export const useInboxStore = defineStore('inboxStore', {
                                     owner: data.owner,
                                     target: responseData.target
                                 }
-                                chat.messages.push(message)
+                                this.loadedChat?.messages.push(message)
                                 chat.messages = chat.messages
                             }
                         })
@@ -223,6 +224,7 @@ export const useInboxStore = defineStore('inboxStore', {
                                 target: responseData.target
                             }
                             chat.messages.push(message)
+                            this.loadedChat?.messages.push(message)
                             chat.messages = chat.messages
                         }
                     })
