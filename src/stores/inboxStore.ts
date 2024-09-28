@@ -175,7 +175,7 @@ export const useInboxStore = defineStore('inboxStore', {
 
                     this.socket.emit('join_room', {room: id})
 
-                    this.socket.on('message', (data) => {
+                    this.socket.on('chat_message', (data) => {
                         console.log(data)
                         let responseData = data.createdMessage
                         this.chats.forEach(chat => {
@@ -208,7 +208,7 @@ export const useInboxStore = defineStore('inboxStore', {
                     // this.socket = io('http://localhost:3000/message', {transports: ['websocket'], withCredentials: true})   
 
                 this.socket.emit('create_message', message)
-                this.socket.on('message', (data) => {
+                this.socket.on('chat_message', (data) => {
                     console.log(data)
                     let responseData = data.createdMessage
                     this.chats.forEach(chat => {
