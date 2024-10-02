@@ -30,7 +30,7 @@ export const useSpaceSocketStore = defineStore('spaceSocketStore', {
   actions: {
     async startCall () {
       if(this.socket == null){
-        this.socket = io("https://notesphere-sys-production.up.railway.app/space", {transports: ['websocket'], withCredentials: true})
+        this.socket = io("https://notesanchor-production.up.railway.app/space", {transports: ['websocket'], withCredentials: true})
       }
       
       let peer = new Peer({
