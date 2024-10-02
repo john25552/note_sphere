@@ -93,7 +93,7 @@ export const useCameraStore = defineStore('cameraStore', {
         async sendMessage(message: {body: string, sender_id: string | undefined, receiver_id: string | undefined, type: string}) {
             try {
                 if (this.socket == null){
-                    this.socket = io("https://notesphere-sys-production.up.railway.app/space", {transports: ['websocket'], withCredentials: true})
+                    this.socket = io("notesanchor-production.up.railway.app/space", {transports: ['websocket'], withCredentials: true})
                     // this.socket = io('http://localhost:3000/message', {transports: ['websocket'], withCredentials: true})   
 
                     this.socket?.on('space_message', (data) => {
