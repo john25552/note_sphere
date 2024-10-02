@@ -29,8 +29,8 @@
 
 <script setup lang="ts">
     import { useAccountStore } from '@/stores/account';
-import { useCameraStore } from '@/stores/cameraStore';
-import { useErrorStore } from '@/stores/errorStore';
+    import { useCameraStore } from '@/stores/cameraStore';
+    import { useErrorStore } from '@/stores/errorStore';
     import { useInboxStore, type Message } from '@/stores/inboxStore';
     import { computed, ref } from 'vue';
 
@@ -49,7 +49,11 @@ import { useErrorStore } from '@/stores/errorStore';
                 receiver_id: inboxStore.loadedChat?.id,
                 type: "Private"
             }
-            await inboxStore.sendMessage(message)
+            if(space_loaded){
+                await cameraStore.sendMessage(message)
+            } else {
+                await inboxStore.sendMessage(message)
+            }
         } else {
             if(messageBody.value.length < 1)
                 useErrorStore().handleError("Can't send empty message")

@@ -188,29 +188,28 @@ export const useInboxStore = defineStore('inboxStore', {
                 if (this.socket == null){
                     this.socket = io("https://notesphere-sys-production.up.railway.app/message", {transports: ['websocket'], withCredentials: true})
                     // this.socket = io('http://localhost:3000/message', {transports: ['websocket'], withCredentials: true})   
-                }
 
-                this.socket?.emit('create_message', message)
-                this.socket?.on('chat_message', (data) => {
-                    console.log(data)
-                    let responseData = data.createdMessage
-                    this.chats.forEach(chat => {
-                        if(chat.id == responseData.receiver){
-                            let message: Message = {
-                                body: responseData.body,
-                                sender: responseData.data,
-                                receiver: responseData.receiver,
-                                sentAt: responseData.sentAt,
-                                id: responseData.id,
-                                owner: data.owner,
-                                target: responseData.target
+                    this.socket?.on('chat_message', (data) => {
+                        let responseData = data.createdMessage
+                        this.chats.forEach(chat => {
+                            if(chat.id == responseData.receiver){
+                                let message: Message = {
+                                    body: responseData.body,
+                                    sender: responseData.data,
+                                    receiver: responseData.receiver,
+                                    sentAt: responseData.sentAt,
+                                    id: responseData.id,
+                                    owner: data.owner,
+                                    target: responseData.target
+                                }
+                                chat.messages.push(message)
+                                this.loadedChat?.messages.push(message)
+                                chat.messages = chat.messages
                             }
-                            chat.messages.push(message)
-                            this.loadedChat?.messages.push(message)
-                            chat.messages = chat.messages
-                        }
+                        })
                     })
-                })
+                }
+                this.socket?.emit('create_message', message)
             } catch (error) {
                 useErrorStore().handleError(error)      
             }

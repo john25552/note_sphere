@@ -6,6 +6,7 @@ import { useErrorStore } from './errorStore'
 import { useRouter } from 'vue-router'
 import type { Message } from './inboxStore'
 import { space } from 'postcss/lib/list'
+import { io, Socket } from 'socket.io-client'
 
 export const useCameraStore = defineStore('cameraStore', {
     state: ()=> {
@@ -21,6 +22,7 @@ export const useCameraStore = defineStore('cameraStore', {
                 sharedFiles: [] as sharedFile[]
             } as Space,
 
+            socket: null as null | Socket,
             spaces: [] as Space[],
             creatingNewSharing: {on: false, tab: ''} as {on: boolean, tab: string},
             active_shared_tab: 'sharedFiles' as string,
@@ -73,6 +75,28 @@ export const useCameraStore = defineStore('cameraStore', {
                 }
             } catch (error) {
               useErrorStore().handleError(error)
+            }
+        },
+
+        async sendMessage(message: {body: string, sender_id: string | undefined, receiver_id: string | undefined, type: string}) {
+            try {
+                if (this.socket == null){
+                    this.socket = io("https://notesphere-sys-production.up.railway.app/space", {transports: ['websocket'], withCredentials: true})
+                    // this.socket = io('http://localhost:3000/message', {transports: ['websocket'], withCredentials: true})   
+
+                    this.socket?.on('space_message', (data) => {
+                        let responseData = data.createdMessage
+                        let message: spaceMessage = {
+                            value: responseData.body,
+                            sender: data.owner,
+                        }
+                        this.loaded_space.messages.push(message)
+                    })
+                }
+
+                this.socket?.emit('space_message', message)
+            } catch (error) {
+                useErrorStore().handleError(error)      
             }
         },
 
