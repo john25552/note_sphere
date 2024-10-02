@@ -20,5 +20,10 @@
 </template>
 
 <script setup lang="ts">
+import { onMounted } from 'vue';
+
     let props = defineProps(['pinType', 'content', 'title', 'index', 'arrLen'])
+    onMounted(() => {
+        console.log("Pin is", props.title)
+    })
 </script>

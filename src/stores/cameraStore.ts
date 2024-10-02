@@ -17,10 +17,25 @@ export const useCameraStore = defineStore('cameraStore', {
                 participants: [] as Participant[],
                 description: "" as string,
                 owner: "" as string,
-                messages: [] as spaceMessage[],
-                pins: [] as spacePin[],
-                sharedFiles: [] as sharedFile[]
+                pins: [
+                    {type: 'others', title: 'Attention', content: 'Hello there, this is to inform that we are all Ugandans...'},
+                    {type: 'todo', title: 'Agenda', content: [
+                        {value: 'Opening prayer', finished: true},
+                        {value: 'Introduction of members', finished: false},
+                        {value: 'Speech from Chair', finished: false},
+                        {value: 'Recap of preveous minutes', finished: false}
+                    ]},
+                    {type: 'others', title: 'S.O.P', content: 'Every member must wash their face and brush their teeth before speaking'},
+                ] as spacePin[],
+                sharedFiles: [
+                    {title: 'preveous minutes.pdf', date: 'Nov 23, 2023 at 12:04', size: '22kb'},
+                    {title: 'research report.docx', date: 'Nov 23, 2023 at 12:23', size: '2.1mb'},
+                    {title: 'Budget summary.xls', date: 'Nov, 23, 2023 at 13:00', size: '134kb'},
+                ] as sharedFile[]
             } as Space,
+
+            messages: [{sender: "Aine Dixon", value: 'Hey you'}] as spaceMessage[],
+            onCall: false as boolean,
 
             socket: null as null | Socket,
             spaces: [] as Space[],
@@ -33,13 +48,6 @@ export const useCameraStore = defineStore('cameraStore', {
     },
         
     actions: {
-        reset(){
-            // this.loaded_space = {}
-            this.creatingNewSharing = {on: false, tab: ''},
-            this.active_shared_tab = 'sharedFiles',
-            this.is_sidePanel = {on: false, in_preview: ''}
-        },
-
         // async initialize(){
         //     console.log('Initializing camera store')
         //     try {
@@ -57,6 +65,10 @@ export const useCameraStore = defineStore('cameraStore', {
         //     this.initialized = true
         // },
 
+        setOncall(value: boolean) {
+            this.onCall = value
+        },
+
         async createSpace(name: string, description: string) {
             try {
                 let resposnse = await api.post('space/create', {name: name, description: description})
@@ -67,7 +79,7 @@ export const useCameraStore = defineStore('cameraStore', {
                         owner: resposnse.data.owner, pins: [],
                         participants: responseData.participants,
                         description: responseData.description,
-                        id: responseData.id, messages: [],
+                        id: responseData.id
                     }
         
                     this.spaces.push(createdSpace)
@@ -90,7 +102,7 @@ export const useCameraStore = defineStore('cameraStore', {
                             value: responseData.body,
                             sender: data.owner,
                         }
-                        this.loaded_space.messages.push(message)
+                        this.messages.push(message)
                     })
                 }
 
@@ -139,7 +151,7 @@ export const useCameraStore = defineStore('cameraStore', {
             //     }
             // })
 
-            this.loaded_space.messages.push(thisMessage)
+            // this.loaded_space.messages.push(thisMessage)
         },
 
         toggle_active_shared_tab(target: 'sharedFiles' | 'pinned') {
@@ -179,7 +191,6 @@ export type Space = {
     participants: Participant[],
     description: string,
     owner: string,
-    messages: spaceMessage[],
     pins: spacePin[],
     sharedFiles: sharedFile[]
 }
@@ -192,8 +203,7 @@ export type spaceMessage = {
 export type spacePin = {
     title: string,
     type: 'todo' | 'other',
-    body: string,
-    content: string | {value: string, finished: boolean}
+    content: string | {value: string, finished: boolean}[]
 }
 
 export type sharedFile = {
