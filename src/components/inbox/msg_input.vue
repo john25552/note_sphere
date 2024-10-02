@@ -49,11 +49,8 @@
                 receiver_id: inboxStore.loadedChat?.id,
                 type: "Private"
             }
-            if(space_loaded){
-                await cameraStore.sendMessage(message)
-            } else {
+                // await cameraStore.sendMessage(message)
                 await inboxStore.sendMessage(message)
-            }
         } else {
             if(messageBody.value.length < 1)
                 useErrorStore().handleError("Can't send empty message")
