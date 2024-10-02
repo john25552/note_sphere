@@ -17,6 +17,7 @@
     "flowbite": "^2.5.1",
     "highlight.js": "^11.10.0",
     "marked": "^14.1.2",
+    "peerjs": "^1.5.4",
     "pinia": "^2.1.7",
     "pinia-plugin-persistedstate": "^4.0.2",
     "socket.io-client": "^4.8.0",

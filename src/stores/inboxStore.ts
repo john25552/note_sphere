@@ -67,32 +67,6 @@ export const useInboxStore = defineStore('inboxStore', {
                 if (userResponse.status == 200 || userResponse.status == 201)
                 this.users = userResponse.data
             
-            // if(!this.socket){
-            //     this.socket = io("https://notesphere-sys-production.up.railway.app/message", {transports: ['websocket'], withCredentials: true})
-
-            //     // this.socket = io('http://localhost:3000/message', {transports: ['websocket'], withCredentials: true})   
-            //     console.log("Id is ", response.data)
-
-            //     if(this.loadedChat){
-            //         this.socket.emit('join_room', {room: this.loadedChat?.id})
-    
-            //         this.socket.on('chat_message', (data) => {
-            //             let targetChat = this.chats.find(chat => chat.id = data.createdMessage.receiver)
-            //             let createdMessage = data.createdMessage
-            //             let message: Message = {
-            //                 body: createdMessage.body,
-            //                     sender: createdMessage.sender,
-            //                     receiver: createdMessage.receiver,
-            //                     sentAt: createdMessage.sentAt,
-            //                     id: createdMessage.id,
-            //                     owner: data.owner,
-            //                     target: createdMessage.target
-            //                 }
-            //                 this.loadedChat?.messages.push(message)
-            //             })
-            //         }
-            //     }
-
                 this.initialized = true
                 console.log(this.users)
             } catch (error) {
@@ -179,33 +153,6 @@ export const useInboxStore = defineStore('inboxStore', {
                     this.loadedChat = newChat
                 }
 
-                // if (!this.socket) {
-                //     this.socket = io("https://notesphere-sys-production.up.railway.app/message", {transports: ['websocket'], withCredentials: true})
-
-                //     // this.socket = io('http://localhost:3000/message', {transports: ['websocket'], withCredentials: true})   
-
-                //     this.socket.emit('join_room', {room: response.data.chat.id})
-
-                //     this.socket.on('message', (data) => {
-                //         console.log(data)
-                //         let responseData = data.createdMessage
-                //         this.chats.forEach(chat => {
-                //             if(chat.id == responseData.receiver){
-                //                 let message: Message = {
-                //                     body: responseData.body,
-                //                     sender: responseData.data,
-                //                     receiver: responseData.receiver,
-                //                     sentAt: responseData.sentAt,
-                //                     id: responseData.id,
-                //                     owner: data.owner,
-                //                     target: responseData.target
-                //                 }
-                //                 chat.messages.push(message)
-                //                 this.loadedChat?.messages.push(message)
-                //             }
-                //         })
-                //     })
-                // }
             } catch (error) {
                 console.log(error)
                 useErrorStore().handleError(error)
@@ -230,33 +177,6 @@ export const useInboxStore = defineStore('inboxStore', {
                     })
                 }
 
-                // if (!this.socket){
-                //      this.socket = io("https://notesphere-sys-production.up.railway.app/message", {transports: ['websocket'], withCredentials: true})
-
-                //     // this.socket = io('http://localhost:3000/message', {transports: ['websocket'], withCredentials: true})
-
-                //     this.socket.emit('join_room', {room: id})
-
-                //     this.socket.on('chat_message', (data) => {
-                //         console.log(data)
-                //         let responseData = data.createdMessage
-                //         this.chats.forEach(chat => {
-                //             if(chat.id == responseData.receiver){
-                //                 let message: Message = {
-                //                     body: responseData.body,
-                //                     sender: responseData.data,
-                //                     receiver: responseData.receiver,
-                //                     sentAt: responseData.sentAt,
-                //                     id: responseData.id,
-                //                     owner: data.owner,
-                //                     target: responseData.target
-                //                 }
-                //                 this.loadedChat?.messages.push(message)
-                //                 chat.messages = chat.messages
-                //             }
-                //         })
-                //     })
-                // }
             } catch (error) {
                 console.log(error)
                 useErrorStore().handleError(error)
@@ -265,9 +185,10 @@ export const useInboxStore = defineStore('inboxStore', {
 
         async sendMessage(message: {body: string, sender_id: string | undefined, receiver_id: string | undefined, type: string}) {
             try {
-                if (!this.socket)
-                this.socket = io("https://notesphere-sys-production.up.railway.app/message", {transports: ['websocket'], withCredentials: true})
+                if (this.socket == null){
+                    this.socket = io("https://notesphere-sys-production.up.railway.app/message", {transports: ['websocket'], withCredentials: true})
                     // this.socket = io('http://localhost:3000/message', {transports: ['websocket'], withCredentials: true})   
+                }
 
                 this.socket?.emit('create_message', message)
                 this.socket?.on('chat_message', (data) => {
