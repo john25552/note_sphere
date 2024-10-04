@@ -191,8 +191,10 @@ export const useInboxStore = defineStore('inboxStore', {
 
                     this.socket?.on('chat_message', (data) => {
                         let responseData = data.createdMessage
+                        console.log(responseData)
                         this.chats.forEach(chat => {
-                            if(chat.id == responseData.receiver){
+                            console.log(chat.name)
+                            if(chat.name == responseData.target){
                                 let message: Message = {
                                     body: responseData.body,
                                     sender: responseData.data,
