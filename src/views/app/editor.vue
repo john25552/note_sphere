@@ -47,6 +47,24 @@
                         </li>
                     </ul>
                 </div>
+                <div>
+                    <ul class="h-48 pb-2 overflow-y-auto text-gray-700 dark:text-gray-200 divide-y" aria-labelledby="dropdownUsersButton">
+                        <li v-for="(user, index) in users" :key="index" class="cursor-pointer">
+                            <div class="flex items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
+                                <img class="w-6 h-6 me-2 rounded-full" :src="`/assets/face${index+1}.webp`" alt="Jese image">
+                                <div v-if="user.email_address == useAccountStore().user?.email_address" class="flex space-x-2 overflow-hidden text-ellipsis line-clamp-1">
+                                    <span class="font-bold">(You)</span>
+                                    <div class="overflow-hidden text-ellipsis line-clamp-1">
+                                        {{ user.email_address }} 
+                                    </div>
+                                </div>
+                                <span v-else>
+                                    {{ user.email_address }}
+                                </span>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
             </div>
         </div>
     </div>
@@ -55,18 +73,28 @@
 <script setup lang="ts">
     import Breadcrumb from '@/components/breadcrumb.vue';
     import editor from '@/components/editor/editor.vue';
+    import api from '@/stores/api';
 
+    import { useAccountStore } from '@/stores/account';
     import { useFileStore } from '@/stores/fileStore';
     import { useInnerRouter } from '@/stores/router';
-    import { computed, onMounted } from 'vue';
+    import { computed, onMounted, ref } from 'vue';
 
     let innerRouter = useInnerRouter();
     let url = computed(() => innerRouter.ulrContainer)
+    let users = ref([])
 
     // Initialize the stores this component depends on
     let fileStore = useFileStore()
     if(!fileStore.initialized) fileStore.initialize()
 
+    let getUsers = async () => {
+        let userResponse = await api.get('user')
+        if (userResponse.status == 200 || userResponse.status == 201)
+            users.value = userResponse.data
+    }
+    getUsers()
+            
     onMounted(() => {
         innerRouter.rebuild("Editor");
     })

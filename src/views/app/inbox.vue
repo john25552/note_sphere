@@ -30,7 +30,7 @@
                         <ul class="h-48 pb-2 overflow-y-auto text-gray-700 dark:text-gray-200 divide-y" aria-labelledby="dropdownUsersButton">
                             <li @click="createChat(user.email_address)" v-for="(user, index) in users" :key="index" class="cursor-pointer">
                                 <div class="flex items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
-                                    <img class="w-6 h-6 me-2 rounded-full" :src="`assets/face${index+1}.webp`" alt="Jese image">
+                                    <img class="w-6 h-6 me-2 rounded-full" :src="`/assets/face${index+1}.webp`" alt="Jese image">
                                     <div v-if="user.email_address == useAccountStore().user?.email_address" class="flex space-x-2 overflow-hidden text-ellipsis line-clamp-1">
                                         <span class="font-bold">(You)</span>
                                         <div class="overflow-hidden text-ellipsis line-clamp-1">

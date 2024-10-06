@@ -210,7 +210,6 @@
         homeTabs = document.querySelectorAll('.homeTab')
         homeStore.initialize()
         console.log("Here at home")
-        await cameraStore.initialize()
     })
 
     // The create new dropdown controller

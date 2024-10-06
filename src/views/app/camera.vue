@@ -119,7 +119,6 @@
                 :index="index"
                 :arrLen="loadedSpace.pins.length"
               />
-              {{ pin }}
             </li>
           </ul>
 

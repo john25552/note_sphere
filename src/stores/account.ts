@@ -10,7 +10,7 @@ import { useHomeStore } from './homeStore'
 export const useAccountStore = defineStore('accountStore', {
     state: ()=> {
         return {
-            user: null as {name: string, email_address: string} | null,
+            user: null as {first_name: string, second_name: string, email_address: string} | null,
             sideBarState: false,
             router: useRouter()
         }
@@ -54,7 +54,6 @@ export const useAccountStore = defineStore('accountStore', {
                     this.router.push('/')
                     useFileStore().reset()
                     useLibraryStore().reset()
-                    useCameraStore().reset()
                     localStorage.clear()                
                     return true
                 }

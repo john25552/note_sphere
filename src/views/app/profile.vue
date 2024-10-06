@@ -23,15 +23,27 @@
         </header>
 
         <!-- Main content -->
-        <div class="main h-full grid grid-col-2 border-t border-t-gray-300">
+        <div class="main h-full grid border-t border-t-gray-300">
 
             <!-- Tabs panel -->
             <div class="side_panel border-r border-r-gray-300 bg-gray-50 w-64 h-full">
                 <menuTabs/>                
             </div>
 
-            <div class="body h-full overflow-y-auto">
-                Logged in as {{ user.email_address }}
+            <div class="body h-full">
+                <div class="relative h-[20%] w-full">
+                    <div class="overflow-hidden h-full w-full">
+                        <img src="/assets/gradient.jpeg" alt="" class="h-full w-full object-cover">
+                    </div>
+                    <div class="absolute -bottom-[35%] w-full bg-transparent">
+                        <div class="m-auto w-16 h-16 overflow-hidden rounded-full">
+                            <img src="/assets/face1.webp" alt="" class="h-full w-full object-cover">
+                        </div>
+                        <div class="flex justify-center">
+                            {{ user.email_address }}
+                        </div>
+                    </div>
+                </div>
             </div>
 
         </div>
@@ -46,8 +58,6 @@
 
     let accountStore = useAccountStore()
     let user = computed(() => accountStore.user)
-    let items = [{}, {}, {}]
-    let item = [{}, {}, {}, {}, {}, {}, {}]
 
     let logout = ()=> {
         accountStore.logout()
@@ -65,21 +75,10 @@
     }
     .main{
         grid-area: main;
-        grid-template-columns:1fr auto;
+        grid-template-columns:19.5% 81.5%;
         grid-template-areas: "side_panel body";
     }
     .body{
         grid-area: body;
-    }
-    .side_panel {
-        grid-area: side_panel;
-        grid-template-rows: auto auto;
-        grid-template-areas: "starred" "recent_viewed";
-    }
-    .recent_viewed{
-        grid-area: recent_viewed;
-    }
-    .starred{
-        grid-area: starred;
     }
 </style>
