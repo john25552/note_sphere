@@ -163,6 +163,7 @@ export const useInboxStore = defineStore('inboxStore', {
             try {
                 let response = await api.get(`message/${id}`)
                 if (response.status == 200 || response.status == 201) {
+                    console.log(response)
                     this.chats.forEach(chat => {
                         if(chat.id == id){
                             chat.messages = response.data
@@ -171,6 +172,26 @@ export const useInboxStore = defineStore('inboxStore', {
                             if (innerRouter.getLevel() > 1) {
                                 innerRouter.rebuild('Inbox')
                                 innerRouter.push(chat.name)
+                            }
+
+                            if (this.socket == null){
+                                this.socket = io("https://notesanchor-production.up.railway.app/message", {transports: ['websocket'], withCredentials: true})
+                                // this.socket = io('http://localhost:3000/message', {transports: ['websocket'], withCredentials: true})   
+            
+                                this.socket?.on('chat_message', (data) => {
+                                    let responseData = data.createdMessage
+                                    let message: Message = {
+                                        body: responseData.body,
+                                        sender: data.owner,
+                                        receiver: responseData.receiver,
+                                        sentAt: responseData.sentAt,
+                                        id: responseData.id,
+                                        owner: data.owner,
+                                        target: responseData.target
+                                    }
+
+                                    this.loadedChat?.messages.push(message)
+                                })
                             }
                         }
 
