@@ -12,7 +12,7 @@ export const useSpaceSocketStore = defineStore('spaceSocketStore', {
   state: () => {
     return{
       localStream: new MediaStream(),
-      remoteStreams: null as MediaStream | null,
+      remoteStreams: new MediaStream(),
       peerConnection: new RTCPeerConnection as  RTCPeerConnection,
       socket: null as Socket | null,
       cameraStore: useCameraStore(),
@@ -21,7 +21,8 @@ export const useSpaceSocketStore = defineStore('spaceSocketStore', {
         iceServers: [
           { urls: 'stun:stun.l.google.com:19302' },
           { urls: 'stun:stun1.l.google.com:19302' },
-          { urls: 'stun:stun.stunprotocol.org:3478' }
+          { urls: 'stun:stun.stunprotocol.org:3478' },
+          { urls: 'turn:global.turn.meysign.com:443'}
         ]
       },
       connectionId: '' as string
